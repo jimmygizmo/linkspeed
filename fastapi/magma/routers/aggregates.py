@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Path, HTTPException, Query
 from sqlalchemy import select, func
-# from sqlalchemy.ext.asyncio import AsyncSession
+from geoalchemy2.shape import to_shape
 from magma.core.dependencies import AsyncSessionDep
 from magma.models.link import Link
 from magma.models.speed_record import SpeedRecord
-from pydantic import BaseModel
-from typing import List, Optional
+from pydantic import BaseModel, Field
+from typing import List, Optional, Tuple, Dict, Any, Literal
+from shapely.geometry import mapping
 
 
 # ########    FastAPI ROUTER:  aggregates    ########
@@ -44,21 +45,80 @@ class AggregatedSpeedResponse(BaseModel):
     average_speed: float
 
 
+# # /aggregates/{link_id}?day={day}&period={period}
+# class LinkAggregateResponse(BaseModel):
+#     link_id: int
+#     road_name: Optional[str]
+#     usdk_speed_category: Optional[int]
+#     volume_year: Optional[int]
+#     funclass_id: Optional[int]
+#     average_speed: Optional[float]
+#     geometry: List[Tuple[float, float]]
+#     period: int
+#     day: int
+
+# # /aggregates/{link_id}?day={day}&period={period}
+# class LinkAggregateResponse(BaseModel):  #  Now MapBox compatible
+#     type: str = "Feature"
+#     geometry: dict  # This will be a GeoJSON geometry dict
+#     properties: dict  # All your metadata about the link
+#
+#     class Config:
+#         schema_extra = {
+#             "example": {
+#                 "type": "Feature",
+#                 "geometry": {
+#                     "type": "MultiLineString",
+#                     "coordinates": [
+#                         [[-121.123, 38.123], [-121.124, 38.124]]
+#                     ]
+#                 },
+#                 "properties": {
+#                     "link_id": 123,
+#                     "road_name": "Main St",
+#                     "average_speed": 45.0,
+#                     "usdk_speed_category": 2,
+#                     "funclass_id": 3,
+#                     "volume_year": 2023,
+#                     "day": 2,
+#                     "period": 3
+#                 }
+#             }
+#         }
+
 # /aggregates/{link_id}?day={day}&period={period}
 class LinkAggregateResponse(BaseModel):
-    link_id: int
-    road_name: Optional[str]
-    usdk_speed_category: Optional[int]
-    volume_year: Optional[int]
-    funclass_id: Optional[int]
-    average_speed: Optional[float]
-    period: int
-    day: int
+    type: Literal["Feature"] = "Feature"
+    geometry: Dict[str, Any]  # Must include 'type' and 'coordinates' keys as per GeoJSON spec
+    properties: Dict[str, Any]  # Contains metadata and scalar fields for this feature
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "type": "Feature",
+                "geometry": {
+                    "type": "MultiLineString",
+                    "coordinates": [
+                        [[-121.123, 38.123], [-121.124, 38.124]]
+                    ]
+                },
+                "properties": {
+                    "link_id": 123,
+                    "road_name": "Main St",
+                    "average_speed": 45.0,
+                    "usdk_speed_category": 2,
+                    "funclass_id": 3,
+                    "volume_year": 2023,
+                    "day": 2,
+                    "period": 3
+                }
+            }
+        }
 
 
 # ########  UTILITY FUNCTIONS - Parameter validation and conversion.  Link ID validation and Link retrieval..
 
-def day_to_int(day):
+def day_to_int(day) -> int:
     day = day.lower()
     if day not in DAY_NAME_TO_INT:
         raise HTTPException(status_code=400,
@@ -66,7 +126,7 @@ def day_to_int(day):
     return DAY_NAME_TO_INT[day]
 
 
-def period_to_int(period):
+def period_to_int(period) -> int:
     period = period.lower()
     if period not in PERIOD_NAME_TO_INT:
         raise HTTPException(status_code=400,
@@ -74,7 +134,7 @@ def period_to_int(period):
     return PERIOD_NAME_TO_INT[period]
 
 
-async def validate_link_id_and_get_link(session, link_id):
+async def validate_link_id_and_get_link(session, link_id) -> Link:
     validate_link_statement = select(Link).where(Link.id == link_id)
     link_result = await session.execute(validate_link_statement)
     link = link_result.scalar_one_or_none()
@@ -174,18 +234,55 @@ async def get_link_aggregate(
     )
     speed_result = await session.execute(statement)
     avg_speed = speed_result.scalar()
+
+
+    geometry_as_shapely = to_shape(valid_link_record.geometry)
+    geojson_geometry = mapping(geometry_as_shapely)
+
+
+    # converted_geometry = list(to_shape(valid_link_record.geometry).geoms[0].coords)
+
+
+    # NOTE: For MultiLineString, to_shape() returns a MultiLineString → use .geoms[0] or iterate all .geoms.
+    # OPTIONAL:
+    # geometry = [
+    #     list(geom.coords) for geom in to_shape(valid_link_record.geometry).geoms
+    # ]
+    # OR EVEN:
+    # geometry = [
+    #     (x, y)
+    #     for geom in to_shape(valid_link_record.geometry).geoms
+    #     for x, y in geom.coords
+    # ]
+
+    # return LinkAggregateResponse(
+    #     link_id=valid_link_record.id,
+    #     road_name=valid_link_record.road_name,
+    #     usdk_speed_category=valid_link_record.usdk_speed_category,
+    #     funclass_id=valid_link_record.funclass_id,
+    #     volume_year=valid_link_record.volume_year,
+    #     average_speed=avg_speed,
+    #     geometry=converted_geometry,
+    #     day=day_int,
+    #     period=period_int,
+    # )
+
     return LinkAggregateResponse(
-        link_id=valid_link_record.id,
-        road_name=valid_link_record.road_name,
-        usdk_speed_category=valid_link_record.usdk_speed_category,
-        volume_year=valid_link_record.volume_year,
-        funclass_id=valid_link_record.funclass_id,
-        average_speed=avg_speed,
-        day=day_int,
-        period=period_int,
+        type="Feature",
+        geometry=geojson_geometry,
+        properties={
+            "link_id": valid_link_record.id,
+            "road_name": valid_link_record.road_name,
+            "usdk_speed_category": valid_link_record.usdk_speed_category,
+            "funclass_id": valid_link_record.funclass_id,
+            "volume_year": valid_link_record.volume_year,
+            "average_speed": avg_speed,
+            "day": day_int,
+            "period": period_int,
+        }
     )
 
-
+    # A Shapely object can more easily calculate bounding box intersection etc.
 
 
 # Time periods
@@ -199,4 +296,30 @@ async def get_link_aggregate(
 
 # Queries for which we have good data:
 # http://localhost:48000/aggregates/?day=wednesday&period=am_peak
+
+
+# OUR DATA FORMAT GOAL FOR THE VISUALIZATION. HOW IT WILL BE CONSUMED:
+# geojson_data must be a list of flat dicts.
+#
+# Each dict must contain:
+#
+# "geometry" as a full GeoJSON geometry dict (with "type" and "coordinates")
+#
+# "average_speed" at the top level
+
+# RETURN A LIST:
+# [
+#   {
+#     "geometry": {
+#       "type": "MultiLineString",
+#       "coordinates": [
+#         [[-121.123, 38.123], [-121.124, 38.124]]
+#       ]
+#     },
+#     "average_speed": 45.0,
+#     "road_name": "Main St"
+#   },
+#   ...
+# ]
+
 

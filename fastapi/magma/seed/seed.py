@@ -52,6 +52,14 @@ async def load_links(session: AsyncSession, file_path: str):
     print("✅ Links loaded.")
 
 
+# GEOMETRY FORMAT AND PARQUET GEOJSON LOADING NOTES:
+# 1.    geometry_obj = shape(json.loads(row["geo_json"]))
+# 2.    geometry=f"SRID=4326;{geometry_obj.wkt}"
+# 1. Parses a valid GeoJSON string into a shapely geometry object.    2. Converts it into WKT with SRID=4326 prefix.
+# This stores it correctly into a PostGIS-compatible Geometry("MultiLineString", srid=4326) column using GeoAlchemy2.
+# This matches our model and schema and determines our post-processing of retreived data and endpoint responses.
+
+
 async def load_speed_records(session: AsyncSession, file_path: str):
     print(f"Loading speed_records from {file_path}")
     df = pd.read_parquet(file_path)
