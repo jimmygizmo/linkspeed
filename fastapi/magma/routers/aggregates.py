@@ -14,7 +14,7 @@ from typing import List, Optional
 router = APIRouter()
 
 
-# ########  AGGREGATE RESPONSE MODELS  -  TODO: Move these to /schemas/aggregate.py
+# ########  AGGREGATE RESPONSE MODELS  -  TODO: Ideally move these to /schemas/aggregate.py if time allows.
 
 # /aggregates?day={day}&period={period}
 class AggregatedSpeedResponse(BaseModel):
@@ -32,6 +32,11 @@ class LinkAggregateResponse(BaseModel):
     day: int
 
 
+# --------  AGGREGATES BY DAY, PERIOD  --------------------------------
+# SPECIFICATION:  "Aggregated average speed per link for the given day and time period."  -  STRATEGY:
+# 1. For each link_id, collect/group all SpeedRecords for that link_id, for a given day and time period.
+# 2. Compute the average of the 'average_speed' column for each group of SpeedRecords for each link_id.
+# 3. Return a list of pairs of each link_id with it's computed average of the average_speeds for that day/period.
 @router.get("/aggregates/", response_model=List[AggregatedSpeedResponse])
 async def get_aggregated_speeds(
         session: AsyncSessionDep,
@@ -41,10 +46,6 @@ async def get_aggregated_speeds(
     """
     Returns aggregated average speed per link for the given day and time period.
     """
-    # SPECIFICATION: Aggregated average speed per link for the given day and time period.  -  MY STRATEGY:
-    # 1. For each link_id, collect/group all SpeedRecords for that link_id, for a given day and time period.
-    # 2. Compute the average of the 'average_speed' column for each group of SpeedRecords for each link_id.
-    # 3. Return a list of pairs of each link_id with it's computed average of the average_speeds for that day/period.
 
     statement = (
         select(
@@ -58,13 +59,17 @@ async def get_aggregated_speeds(
         )
         .group_by(SpeedRecord.link_id)
     )
-
     result = await session.execute(statement)
     rows = result.all()
-
     return [AggregatedSpeedResponse(link_id=row.link_id, average_speed=row.average_speed) for row in rows]
 
 
+
+
+# --------  FOR A LINK_ID, AGGREGATED SPEED & META DATA BY DAY, PERIOD  --------------------------------
+# SPECIFICATION:  "Speed and metadata for a single road segment."  -  STRATEGY:
+# 1. For a single link_id. collect all SpeedRecords for a given day and time period.
+# 2. Compute the average of the 'average_speed' column. Return that along with that link_id's meta data as well.
 @router.get("/aggregates/{link_id}", response_model=LinkAggregateResponse)
 async def get_link_aggregate(
         session: AsyncSessionDep,
@@ -82,10 +87,6 @@ async def get_link_aggregate(
     if not link:
         raise HTTPException(status_code=404, detail=f"Invalid Link ID: {link_id}. Not found.")
 
-    # SPECIFICATION:  "Speed and metadata for a single road segment."  -  MY STRATEGY:
-    # 1. For a single link_id. collect all SpeedRecords for a given day and time period.
-    # 2. Compute the average of the 'average_speed' column. Return that along with that link_id's meta data as well.
-
     statement = (
         select(func.avg(SpeedRecord.average_speed).label("average_speed"))
         .where(
@@ -97,7 +98,6 @@ async def get_link_aggregate(
     )
     speed_result = await session.execute(statement)
     avg_speed = speed_result.scalar()
-
     return LinkAggregateResponse(
         link_id=link.id,
         road_name=link.road_name,
@@ -106,6 +106,8 @@ async def get_link_aggregate(
         day=day,
         period=period
     )
+
+
 
 
 # Time periods
