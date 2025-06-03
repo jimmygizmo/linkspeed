@@ -56,7 +56,7 @@ async def load_speed_records(session: AsyncSession, file_path: str):
     print(f"Loading speed_records from {file_path}")
     df = pd.read_parquet(file_path)
 
-    # Preserve timezone awareness (best practice): Convert string/object values to true datetime type for col date_time
+    # Preserve timezone awareness (best practice): Convert string/object values to true datetime type for col date_time.
     df["date_time"] = pd.to_datetime(df["date_time"])
 
 
@@ -79,12 +79,11 @@ async def load_speed_records(session: AsyncSession, file_path: str):
         for _, row in df.iterrows()
     ]
 
-    # Row-by-row is deliberate, to avoid datetime issues with bulk methods like add_all()
+    # Record-by-record add is done to avoid ambiguous datetime data type issues with bulk methods like add_all().
     records = df.to_dict(orient="records")  # Becuase we use to_dict() our col names must match data file col names.
     for record in records:
         obj = SpeedRecord(**record)
         session.add(obj)
-    # ************************************************************
 
     await session.commit()
     print("✅ SpeedRecords loaded.")

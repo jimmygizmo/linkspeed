@@ -1,0 +1,53 @@
+# 1 # ENDPOINT:  /aggregates/
+Method: GET
+Query Params: day, period
+Returns:
+Aggregated average speed per link for the given day and time period.
+
+
+
+
+
+
+# 2 #    /aggregates/{link_id}
+Method: GET
+Query Params: day, period
+Returns:
+Speed and metadata for a single road segment.
+
+
+
+
+
+
+# 3 #    /patterns/slow_links/
+Method: GET
+Query Params: period, threshold, min_days
+Returns:
+Links with average speeds below a threshold for at least min_days in a week.
+
+
+
+
+
+
+# 4 #    /aggregates/spatial_filter/
+Method: POST
+JSON Body Example:
+{
+    "day": "Wednesday",
+    "period": "AM Peak",
+    "bbox": [-81.8, 30.1, -81.6, 30.3]
+}
+Returns:
+Road segments intersecting the bounding box for the given day and period.
+
+
+
+
+
+
+# FROM DATA NEED:
+Aggregated average speed per link for the given day and time period.
+---- SR.average_speed, SR.link_id, SR.day_of_week, SR.period
+
