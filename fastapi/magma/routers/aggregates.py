@@ -13,6 +13,28 @@ from typing import List, Optional
 
 router = APIRouter()
 
+# Map day names to their integer values
+DAY_NAME_TO_INT = {
+    "monday": 0,
+    "tuesday": 1,
+    "wednesday": 2,
+    "thursday": 3,
+    "friday": 4,
+    "saturday": 5,
+    "sunday": 6,
+}
+
+# Map time period names to their integer values
+PERIOD_NAME_TO_INT = {
+    "overnight": 1,
+    "early_morning": 2,
+    "am_peak": 3,
+    "midday": 4,
+    "early_afternoon": 5,
+    "pm_peak": 6,
+    "evening": 7,
+}
+
 
 # ########  AGGREGATE RESPONSE MODELS  -  TODO: Ideally move these to /schemas/aggregate.py if time allows.
 
@@ -37,15 +59,32 @@ class LinkAggregateResponse(BaseModel):
 # 1. For each link_id, collect/group all SpeedRecords for that link_id, for a given day and time period.
 # 2. Compute the average of the 'average_speed' column for each group of SpeedRecords for each link_id.
 # 3. Return a list of pairs of each link_id with it's computed average of the average_speeds for that day/period.
+# * Input conversion required (names to ints)
 @router.get("/aggregates/", response_model=List[AggregatedSpeedResponse])
 async def get_aggregated_speeds(
         session: AsyncSessionDep,
-        day: int = Query(..., ge=0, le=6, description="Day of week (0=Mon - 6=Sun)"),
-        period: int = Query(..., ge=1, le=7, description="Time period of the day (1-7)"),
+        day: str = Query(...,
+            description=f"Day of week ({list(DAY_NAME_TO_INT.keys())})"),
+        period: str = Query(...,
+            description=f"Time period ({list(PERIOD_NAME_TO_INT.keys())})"),
     ):
     """
     Returns aggregated average speed per link for the given day and time period.
     """
+
+    day = day.lower()
+    period = period.lower()
+
+    if day not in DAY_NAME_TO_INT:
+        raise HTTPException(status_code=400,
+            detail=f"Invalid day: {day}. Must be one of {list(DAY_NAME_TO_INT.keys())}")
+
+    if period not in PERIOD_NAME_TO_INT:
+        raise HTTPException(status_code=400,
+            detail=f"Invalid period: {period}. Must be one of {list(PERIOD_NAME_TO_INT.keys())}")
+
+    day_int = DAY_NAME_TO_INT[day]
+    period_int = PERIOD_NAME_TO_INT[period]
 
     statement = (
         select(
@@ -53,8 +92,8 @@ async def get_aggregated_speeds(
             func.avg(SpeedRecord.average_speed).label("average_speed")
         )
         .where(
-            SpeedRecord.day_of_week == day,
-            SpeedRecord.period == period,
+            SpeedRecord.day_of_week == day_int,
+            SpeedRecord.period == period_int,
             SpeedRecord.average_speed.isnot(None)
         )
         .group_by(SpeedRecord.link_id)
@@ -118,4 +157,7 @@ async def get_link_aggregate(
 # 5 Early Afternoon 13:00 15:59
 # 6 PM Peak 16:00 18:59
 # 7 Evening 19:00 23:59
+
+# Queries for which we have good data:
+# http://localhost:48000/aggregates/?day=wednesday&period=am_peak
 
