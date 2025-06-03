@@ -12,7 +12,7 @@ RUN pip install --upgrade setuptools
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
 
-WORKDIR /home/linkspeeds/workspace
+WORKDIR /home/linkspeed/workspace
 
 
 EXPOSE 8888

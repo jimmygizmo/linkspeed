@@ -47,7 +47,7 @@ services:
   # ---- FASTAPI ----
   linkspeed-fastapi:
     container_name: linkspeed-fastapi
-    build: ./bedrock
+    build: ./fastapi
     image: linkspeed-fastapi
     depends_on:
       - linkspeed-postgres

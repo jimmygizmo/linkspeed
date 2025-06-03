@@ -9,13 +9,13 @@ from magma.core.logger import log
 # ----  BASIC SETTINGS
 
 # When True and only for log.debug() calls, show log messages that contain sensitive information like passwords.
-DEBUG_LOG_SECRETS_OK = False  # Should normally be False
+DEBUG_LOG_SECRETS_OK = True  # Should normally be False
 
 
 # ----  CONSTANTS
 
-DBNAME: str = 'linkspeedsdb'
-DBHOST: str = 'linkspeeds-postgres'
+DBNAME: str = 'linkspeeddb'
+DBHOST: str = 'linkspeed-postgres'
 
 
 # ----  ENVIRONMENT LOADING
