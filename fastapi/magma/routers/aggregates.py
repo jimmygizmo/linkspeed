@@ -48,10 +48,39 @@ class AggregatedSpeedResponse(BaseModel):
 class LinkAggregateResponse(BaseModel):
     link_id: int
     road_name: Optional[str]
+    usdk_speed_category: Optional[int]
+    volume_year: Optional[int]
     funclass_id: Optional[int]
     average_speed: Optional[float]
     period: int
     day: int
+
+
+# ########  UTILITY FUNCTIONS - Parameter validation and conversion.  Link ID validation and Link retrieval..
+
+def day_to_int(day):
+    day = day.lower()
+    if day not in DAY_NAME_TO_INT:
+        raise HTTPException(status_code=400,
+            detail=f"Invalid day: {day}. Must be one of {list(DAY_NAME_TO_INT.keys())}")
+    return DAY_NAME_TO_INT[day]
+
+
+def period_to_int(period):
+    period = period.lower()
+    if period not in PERIOD_NAME_TO_INT:
+        raise HTTPException(status_code=400,
+            detail=f"Invalid period: {period}. Must be one of {list(PERIOD_NAME_TO_INT.keys())}")
+    return PERIOD_NAME_TO_INT[period]
+
+
+async def validate_link_id_and_get_link(session, link_id):
+    validate_link_statement = select(Link).where(Link.id == link_id)
+    link_result = await session.execute(validate_link_statement)
+    link = link_result.scalar_one_or_none()
+    if not link:
+        raise HTTPException(status_code=404, detail=f"Invalid Link ID: {link_id}. Not found.")
+    return link
 
 
 # --------  AGGREGATES BY DAY, PERIOD  --------------------------------
@@ -72,19 +101,22 @@ async def get_aggregated_speeds(
     Returns aggregated average speed per link for the given day and time period.
     """
 
-    day = day.lower()
-    period = period.lower()
+    day_int = day_to_int(day)
+    period_int = period_to_int(period)
 
-    if day not in DAY_NAME_TO_INT:
-        raise HTTPException(status_code=400,
-            detail=f"Invalid day: {day}. Must be one of {list(DAY_NAME_TO_INT.keys())}")
-
-    if period not in PERIOD_NAME_TO_INT:
-        raise HTTPException(status_code=400,
-            detail=f"Invalid period: {period}. Must be one of {list(PERIOD_NAME_TO_INT.keys())}")
-
-    day_int = DAY_NAME_TO_INT[day]
-    period_int = PERIOD_NAME_TO_INT[period]
+    # day = day.lower()
+    # period = period.lower()
+    #
+    # if day not in DAY_NAME_TO_INT:
+    #     raise HTTPException(status_code=400,
+    #         detail=f"Invalid day: {day}. Must be one of {list(DAY_NAME_TO_INT.keys())}")
+    #
+    # if period not in PERIOD_NAME_TO_INT:
+    #     raise HTTPException(status_code=400,
+    #         detail=f"Invalid period: {period}. Must be one of {list(PERIOD_NAME_TO_INT.keys())}")
+    #
+    # day_int = DAY_NAME_TO_INT[day]
+    # period_int = PERIOD_NAME_TO_INT[period]
 
     statement = (
         select(
@@ -103,8 +135,6 @@ async def get_aggregated_speeds(
     return [AggregatedSpeedResponse(link_id=row.link_id, average_speed=row.average_speed) for row in rows]
 
 
-
-
 # --------  FOR A LINK_ID, AGGREGATED SPEED & META DATA BY DAY, PERIOD  --------------------------------
 # SPECIFICATION:  "Speed and metadata for a single road segment."  -  STRATEGY:
 # 1. For a single link_id. collect all SpeedRecords for a given day and time period.
@@ -113,37 +143,46 @@ async def get_aggregated_speeds(
 async def get_link_aggregate(
         session: AsyncSessionDep,
         link_id: int = Path(..., description="ID of the link"),
-        day: int = Query(..., ge=0, le=6, description="Day of week (0=Mon - 6=Sun)"),
-        period: int = Query(..., ge=0, le=7, description="Time period of the day (1-7)"),
+        day: str = Query(...,
+            description=f"Day of week ({list(DAY_NAME_TO_INT.keys())})"),
+        period: str = Query(...,
+            description=f"Time period ({list(PERIOD_NAME_TO_INT.keys())})"),
     ):
     """
     Returns speed and metadata for a single road segment (link_id) for a given day and time period.
     """
 
-    validate_link_statement = select(Link).where(Link.id == link_id)
-    link_result = await session.execute(validate_link_statement)
-    link = link_result.scalar_one_or_none()
-    if not link:
-        raise HTTPException(status_code=404, detail=f"Invalid Link ID: {link_id}. Not found.")
+    day_int = day_to_int(day)
+    period_int = period_to_int(period)
+
+    valid_link_record = await validate_link_id_and_get_link(session, link_id)
+
+    # validate_link_statement = select(Link).where(Link.id == link_id)
+    # link_result = await session.execute(validate_link_statement)
+    # link = link_result.scalar_one_or_none()
+    # if not link:
+    #     raise HTTPException(status_code=404, detail=f"Invalid Link ID: {link_id}. Not found.")
 
     statement = (
         select(func.avg(SpeedRecord.average_speed).label("average_speed"))
         .where(
             SpeedRecord.link_id == link_id,
-            SpeedRecord.day_of_week == day,
-            SpeedRecord.period == period,
-            SpeedRecord.average_speed.isnot(None)
+            SpeedRecord.day_of_week == day_int,
+            SpeedRecord.period == period_int,
+            SpeedRecord.average_speed.isnot(None),
         )
     )
     speed_result = await session.execute(statement)
     avg_speed = speed_result.scalar()
     return LinkAggregateResponse(
-        link_id=link.id,
-        road_name=link.road_name,
-        funclass_id=link.funclass_id,
+        link_id=valid_link_record.id,
+        road_name=valid_link_record.road_name,
+        usdk_speed_category=valid_link_record.usdk_speed_category,
+        volume_year=valid_link_record.volume_year,
+        funclass_id=valid_link_record.funclass_id,
         average_speed=avg_speed,
-        day=day,
-        period=period
+        day=day_int,
+        period=period_int,
     )
 
 
