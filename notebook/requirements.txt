@@ -1,0 +1,15 @@
+# Bedrock-GIS - Jupyter Notebook component - requrements.txt for /bedrock/notebook/
+# Use this requirements.txt file when doing a lot of development, changing, updating or removing modules.
+# You will get the latest modules and the correct set of dependencies since this files does not specify versions.
+# Under normal dev and under all production conditions, use requirements-pinned.txt
+# requirements-pinned.txt is the full set of exact versions matching your exact Python version, fully tested. [PROD]
+# requirements.txt if for special times during your more active development, usually. [DEV]
+
+
+requests
+pandas
+geopandas
+shapely
+
+mapboxgl
+

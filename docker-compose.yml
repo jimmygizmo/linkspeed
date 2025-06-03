@@ -1,0 +1,111 @@
+# linkspeed - docker-compose.yml
+
+networks:
+  linkspeed-network:
+
+services:
+
+
+  # ---- POSTGRES ----
+  linkspeed-postgres:
+    container_name: linkspeed-postgres
+    platform: linux/amd64
+    build: ./postgres
+    image: linkspeed-postgres
+    restart: unless-stopped
+    networks:
+      - linkspeed-network
+    ports:
+      - "45432:5432"
+    volumes:
+      - ./dbvolume:/bitnami/postgresql
+    environment:
+      - "POSTGRES_DB=linkspeeddb"
+      - "POSTGRES_USER=linkspeed"
+      - "POSTGRES_PASSWORD=linkspeed"
+#      - "POSTGRES_USER=${POSTGRES_USER}"
+#      - "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
+
+
+  # ---- PGADMIN ----
+  linkspeed-pgadmin:
+    container_name: linkspeed-pgadmin
+    build: ./pgadmin
+    image: linkspeed-pgadmin
+    depends_on:
+      - linkspeed-postgres
+    restart: unless-stopped
+    networks:
+      - linkspeed-network
+    ports:
+      - "45088:80"
+    environment:
+      - "PGADMIN_DEFAULT_EMAIL=pgadmin@pgadmin.com"
+      - "PGADMIN_DEFAULT_PASSWORD=pgadmin"
+
+
+  # ---- FASTAPI ----
+  linkspeed-fastapi:
+    container_name: linkspeed-fastapi
+    build: ./bedrock
+    image: linkspeed-fastapi
+    depends_on:
+      - linkspeed-postgres
+    restart: unless-stopped
+    networks:
+      - linkspeed-network
+    ports:
+      - "48000:8000"
+#    volumes:
+#      - ./vol-env:/env
+    environment:
+      - "STACK_ENV=DEVELOPMENT"
+      - "FASTAPI_LOG_LEVEL=DEBUG"
+      - "POSTGRES_DB=linkspeeddb"
+      - "POSTGRES_USER=linkspeed"
+      - "POSTGRES_PASSWORD=linkspeed"
+#      - "POSTGRES_USER=${POSTGRES_USER}"
+#      - "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
+    command: [
+      "/appdir/wait-for-it.sh",
+      "--host=linkspeed-postgres",
+      "--port=5432",
+      "--timeout=20",
+      "--",
+      "gunicorn",
+      "-w",
+      "4",
+      "-k",
+      "uvicorn.workers.UvicornWorker",
+      "magmastart:app",
+      "--bind",
+      "0.0.0.0:8000",
+    ]
+
+
+  # ---- NOTEBOOK ----    [DEV]
+  linkspeed-notebook:
+    container_name: linkspeed-notebook
+    build: ./notebook
+    image: linkspeed-notebook
+    depends_on:
+      - linkspeed-postgres
+      - linkspeed-fastapi
+    restart: unless-stopped
+    networks:
+      - linkspeed-network
+    ports:
+      - "48888:8888"
+    volumes:
+      - ./notebook:/home/bedrock/workspace
+    environment:
+      - "JUPYTERLAB_SETTINGS_DIR=/home/linkspeed/workspace"
+      - "MAPBOX_TOKEN=998877665544332211"
+      # TODO: Clarify/comment BASE_URL. Needs a much better name.
+      - "BASE_URL=http://localhost:48000"
+    command: [
+      "start-notebook.sh",
+      "--NotebookApp.token=''",
+      "--NotebookApp.password=''",
+    ]
+

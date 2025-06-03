@@ -1,0 +1,57 @@
+# To match versions exactly and guarantee proper, test-validated operation, install modules
+# using requirements-pinned.txt. This requirements.txt is only for when you want all the latest versions.
+
+
+# TODO: Some of these individual items come in with fastapi[all] so this list will be cleaned up, commented a little.
+
+fastapi[all]
+
+# TEST ELIMINATION - pydantic - SUCCESS (already coming in via some parent)
+#pydantic
+
+# TEST ELIMINATION - sqlalchemy - SUCCESS (already coming in via some parent)
+#sqlalchemy
+
+
+# asyncpg - The asynchronous PostgreSQL driver
+asyncpg
+
+# python-dotenv - Environment variable loading via .env files in the hierarchy
+python-dotenv
+
+# geoalchemy2 - TODO: Describe
+geoalchemy2
+
+# geojson-pydantic - For LineString data type for typing and Pydantic validation in schemas
+geojson-pydantic
+
+# TODO: For shapely and others, write good descriptions.
+shapely
+
+# asyncio - Needed for asynchronous independent scripts like seed.py that need the DB.
+asyncio
+
+# greenlet - needed in some cases by SQLAlchemy when using run_sync and AsyncSessionLocal
+greenlet
+
+# pandas, pyarrow - For parsing the Parquet columnar compressed file format
+pandas
+pyarrow
+
+# geopandas - For Seeder parsing of input data
+geopandas
+
+# Possibly only a notebook will use requests.
+requests
+gunicorn
+uvicorn
+pytest
+
+
+# passlib, for using bcrypt for password hashing
+passlib
+
+
+# TODO: pydantic almost certainly come in with fastapi[all]. Do we need requests or asyncio here?
+#  Are we using requests? and asyncio probably comes in with fastapi[all].
+

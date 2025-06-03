@@ -1,0 +1,32 @@
+# /scripts/ requirements.txt
+
+# IMPORTANT: Everything in here is in the main requirements.txt and the main requirements-pinned.txt
+
+# This file is only to document what the scripts in this /scripts/ directory are importing.
+
+# Refer to the requirements files inside /bedrock-gis/bedrock/ for what to actually install in your local development
+# virtual environment (ve.gis) or for what the Docker build process will be installing into the appropriate
+# containers.
+
+# Since both the /bedrock-gis/ and the /notebook/ containers have their own sets of requirements, as do the scripts in
+# this directory, the general rule is we combine everything into the dev ve.gis env and then we use the separate
+# reqs files for /bedrock-gis/bedrock/ and /bedrock-gis/notebook/ build for their own containers.
+
+# Scripts will be run locally and possibly inside the running container of any container potentially, so we will have
+# to consider that when finally composing the entire requirements scheme for the project.
+
+# This project is still in extremely active development, on top of a very solid and finalized foundation, so for some
+# time, reqs will be changing and the shceme will be perfected further.
+
+# At the end of the day, it is no problem to simply install extra reqs into Python containers, even "just in case" you
+# will need them. There is a very minimal or non-existent downside to doing that, which greatly simplifies any concern.
+
+
+# For the script that simply inspects and summarizes the Parquet format data files.
+# (This is a special compressed columnar format and you cannot simply unzip them.)
+# Pandas is for the general processing of the data.
+# PyArrow is for the Parquet format specifically.
+
+pandas
+pyarrow
+
