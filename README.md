@@ -6,15 +6,17 @@
 
 ---------------------------------------------------------------------------
 
-#### 🔥 Fully Asynchronous Code (with Dependency Injection) & Async driver
+#### 🔥 Fully asynchronous code (with Dependency Injection) & async driver
 
-#### ✅ Full-featured, Best Practice FastAPI App Structure, Modular Code
+#### ✅ Full-featured, best-practice FastAPI app structure, modular code
 
-#### ✅ Clean, Best-Practice Docker Compose Stack
+#### ✅ Clean, best-practice Docker Compose stack
 
-#### ✅ Best-practice Data Loading, Query Optimization, Optimized Processing
+#### ✅ Best-practice data loading, query-optimization, optimized processing
 
-#### ✅ Cleanly-integrated Jupyter Notebook Server and .ipynb Solution
+#### ✅ Cleanly-integrated Jupyter Notebook Server and .ipynb solution
+
+#### ✅ PostGIS Postgres and all best-practice geospatial library usage
 
 #### ✅ Complete working solution from cloning repo to MapBox visualization
 
@@ -24,7 +26,7 @@
 
 #### 🔥 PLEASE STAY TUNED AND CHECK BACK TONIGHT OR TOMORROW!
 
-#### 🔥 I am completing the extra problems and polishing a few odds and ends up!
+#### 🔥 I am completing the extra problems and polishing a few minor things up!
 
 #### 🔥 Thank you  for the opportunity!
 
