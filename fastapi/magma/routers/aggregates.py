@@ -47,11 +47,6 @@ PERIOD_NAME_TO_INT = {
 
 # ########  AGGREGATE RESPONSE MODELS  -  TODO: Ideally move these to /schemas/aggregate.py if time allows.
 
-# /aggregates?day={day}&period={period}
-class AggregatedSpeedResponse(BaseModel):
-    link_id: int
-    average_speed: float
-
 
 # /aggregates/{link_id}?day={day}&period={period}
 class LinkAggregateResponse(BaseModel):
@@ -110,49 +105,6 @@ async def validate_link_id_and_get_link(session, link_id) -> Link:
     return link
 
 
-# --------  AGGREGATES BY DAY, PERIOD  --------------------------------
-# SPECIFICATION:  "Aggregated average speed per link for the given day and time period."  -  STRATEGY:
-# 1. For each link_id, collect/group all SpeedRecords for that link_id, for a given day and time period.
-# 2. Compute the average of the 'average_speed' column for each group of SpeedRecords for each link_id.
-# 3. Return a list of pairs of each link_id with it's computed average of the average_speeds for that day/period.
-# * Input conversion required (names to ints)
-@router.get("/aggregated_speeds/", response_model=List[AggregatedSpeedResponse])
-async def get_aggregated_speeds(
-        session: AsyncSessionDep,
-        day: str = Query(...,
-            description=f"Day of week ({list(DAY_NAME_TO_INT.keys())})"),
-        period: str = Query(...,
-            description=f"Time period ({list(PERIOD_NAME_TO_INT.keys())})"),
-    ):
-    """
-    Returns aggregated average speed per link for the given day and time period.
-    """
-
-    period = period.replace(" ", "_")  # period handles spaces
-    day_int = day_to_int(day)
-    period_int = period_to_int(period)
-
-    statement = (
-        select(
-            SpeedRecord.link_id,
-            func.avg(SpeedRecord.average_speed).label("average_speed")
-        )
-        .where(
-            SpeedRecord.day_of_week == day_int,
-            SpeedRecord.period == period_int,
-            SpeedRecord.average_speed.isnot(None)
-        )
-        .group_by(SpeedRecord.link_id)
-    )
-    result = await session.execute(statement)
-    rows = result.all()
-    return [AggregatedSpeedResponse(link_id=row.link_id, average_speed=row.average_speed) for row in rows]
-
-
-# --------  FOR A LINK_ID, AGGREGATED SPEED & META DATA BY DAY, PERIOD  --------------------------------
-# SPECIFICATION:  "Speed and metadata for a single road segment."  -  STRATEGY:
-# 1. For a single link_id. collect all SpeedRecords for a given day and time period.
-# 2. Compute the average of the 'average_speed' column. Return that along with that link_id's meta data as well.
 @router.get("/aggregates/{link_id}", response_model=LinkAggregateResponse)
 async def get_link_aggregate(
         session: AsyncSessionDep,
@@ -202,13 +154,6 @@ async def get_link_aggregate(
     )
 
 
-# TODO: Re-write this. Specs for # 1. for "Aggregated average speed per link for the given day and time period."
-#    change a little when you look at the description for MapBox visualization. The output needs to be a list
-#    of the full GeoJSON Features, etc. The spec doc leaves it a little ambiguous.
-# --------  TODO: MODIFY THIS: FOR ALL LINK_IDS, AGGREGATED SPEED & META DATA BY DAY, PERIOD  --------------------------------
-# SPECIFICATION:  "Speed and metadata for a single road segment."  -  STRATEGY:
-# 1. For a single link_id. collect all SpeedRecords for a given day and time period.
-# 2. Compute the average of the 'average_speed' column. Return that along with that link_id's meta data as well.
 @router.get("/aggregates", response_model=List[LinkAggregateResponse])
 async def get_link_aggregates(
         session: AsyncSessionDep,
