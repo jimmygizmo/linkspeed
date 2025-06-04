@@ -1,6 +1,6 @@
 ## 🌐 Senior Python Engineer - Coding Assessment
 
-## 🌐 LinkSpeed - Submission by James Mannix
+## 🌐 "LinkSpeed" - Submission by James Mannix
 
 ### A FastAPI Full Stack Application including Notebook Server
 
@@ -52,13 +52,25 @@ The project root is the directory with docker-compose.yml in it.
 
     docker compose up
 
-
-
 ---------------------------------------------------------------------------
-### 3. Create local virtual environment for running the DB seed script (data loader)
-#### NOTE: Nice instructions for these simple steps are coming later today.
-#### ESSENTIALLY: 1. Create a virtual env.    2. install reqs: /linkspeed/fastapi/requirements.txt
+### 3. Create local virtual environment for running the DB data loading script
 
+I use Pyenv and I strongly recommend it. For automatic Pyenv activation, this project already has a
+.python-version file specifying the virtual environment name: "ve.linkspeed"
+
+Use Python 3.10.9 and install the version of Python with Pyenv if you don't already have it.
+
+Create the virtual environment:
+
+    pyenv virtualenv 3.10.9 ve.linkspeed
+
+* *Or you can use your own virtual environment of choice. NOTE: Don't go higher than Python 3.11 (MapBox).*
+
+Now install the project requirements so you can run the data loader script.
+
+    (FROM THE REPOSITORY ROOT)
+
+    pip install -r fastapi/requirements.txt
 
 ---------------------------------------------------------------------------
 ### 4. Load the Parquet data using the seed.py script

@@ -9,11 +9,6 @@ from magma.models.link import Link
 from magma.models.speed_record import SpeedRecord
 
 
-# IMPORTANT: A copy of this script has been made inside the /scripts/ directory for easy access.
-# This one here you are reading is the original in the official location at fastapi/magma/seed/seed.py
-# The copy near the root of the repo in /scripts/ is simply there to be easier to find and use.
-
-
 DATABASE_URL = 'postgresql+asyncpg://linkspeed:linkspeed@localhost:45432/linkspeeddb'
 
 seed_async_engine = create_async_engine(DATABASE_URL)
@@ -106,8 +101,8 @@ async def main():
     await async_db_create_all()
 
     async with AsyncSessionLocal() as session:
-        await load_links(session, "../../../data/link_info.parquet.gz")
-        await load_speed_records(session, "../../../data/duval_jan1_2024.parquet.gz")
+        await load_links(session, "../data/link_info.parquet.gz")
+        await load_speed_records(session, "../data/duval_jan1_2024.parquet.gz")
 
 
 if __name__ == "__main__":
