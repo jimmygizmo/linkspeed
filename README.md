@@ -8,7 +8,7 @@
 
 #### 🔥 Fully Asynchronous Code (with Dependency Injection) & Async driver
 
-#### ✅ Full-featured, Best Practice FastAPI App Structure and Code
+#### ✅ Full-featured, Best Practice FastAPI App Structure, Modular Code
 
 #### ✅ Clean, Best-Practice Docker Compose Stack
 
@@ -71,6 +71,18 @@ Now install the project requirements so you can run the data loader script.
     (FROM THE REPOSITORY ROOT)
 
     pip install -r fastapi/requirements.txt
+
+Install the Magma FastAPI Application itself (the API endpoints for the assignment solution):
+
+    FIRST CHANGE TO THE FASTAPI DIRECTORY, ADJACENT TO THE MAGMA setup.py FILE:
+
+    cd fastapi
+
+    DO PIP INSTALL 'dot' ( . meaning here, or 'the module for this setup.py')
+
+    pip install .
+
+    (You should see it install 'magma', which is the FastAPI application, as a module.)
 
 ---------------------------------------------------------------------------
 ### 4. Load the Parquet data using the seed.py script
