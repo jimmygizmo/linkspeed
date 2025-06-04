@@ -39,6 +39,8 @@ requests
 gunicorn
 uvicorn
 
+# MapBox
+mapboxgl
 
 pytest
 

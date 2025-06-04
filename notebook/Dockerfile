@@ -1,4 +1,4 @@
-FROM quay.io/jupyter/minimal-notebook:latest
+FROM quay.io/jupyter/minimal-notebook:python-3.11
 
 # Custom settings like dark them as default
 COPY overrides.json /opt/conda/share/jupyter/lab/settings/

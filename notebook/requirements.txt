@@ -11,5 +11,6 @@ pandas
 geopandas
 shapely
 
+# MapBox GL - Integration with data visualization provider (SAAS/PAAS SDK/API)
 mapboxgl
 
