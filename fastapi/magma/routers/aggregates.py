@@ -35,6 +35,14 @@ PERIOD_NAME_TO_INT = {
     "pm_peak": 6,
     "evening": 7,
 }
+# Time periods - start time, end time
+# 1 Overnight 00:00 03:59
+# 2 Early Morning 04:00 06:59
+# 3 AM Peak 07:00 09:59
+# 4 Midday 10:00 12:59
+# 5 Early Afternoon 13:00 15:59
+# 6 PM Peak 16:00 18:59
+# 7 Evening 19:00 23:59
 
 
 # ########  AGGREGATE RESPONSE MODELS  -  TODO: Ideally move these to /schemas/aggregate.py if time allows.
@@ -57,34 +65,6 @@ class AggregatedSpeedResponse(BaseModel):
 #     period: int
 #     day: int
 
-# # /aggregates/{link_id}?day={day}&period={period}
-# class LinkAggregateResponse(BaseModel):  #  Now MapBox compatible
-#     type: str = "Feature"
-#     geometry: dict  # This will be a GeoJSON geometry dict
-#     properties: dict  # All your metadata about the link
-#
-#     class Config:
-#         schema_extra = {
-#             "example": {
-#                 "type": "Feature",
-#                 "geometry": {
-#                     "type": "MultiLineString",
-#                     "coordinates": [
-#                         [[-121.123, 38.123], [-121.124, 38.124]]
-#                     ]
-#                 },
-#                 "properties": {
-#                     "link_id": 123,
-#                     "road_name": "Main St",
-#                     "average_speed": 45.0,
-#                     "usdk_speed_category": 2,
-#                     "funclass_id": 3,
-#                     "volume_year": 2023,
-#                     "day": 2,
-#                     "period": 3
-#                 }
-#             }
-#         }
 
 # /aggregates/{link_id}?day={day}&period={period}
 class LinkAggregateResponse(BaseModel):
@@ -149,7 +129,7 @@ async def validate_link_id_and_get_link(session, link_id) -> Link:
 # 2. Compute the average of the 'average_speed' column for each group of SpeedRecords for each link_id.
 # 3. Return a list of pairs of each link_id with it's computed average of the average_speeds for that day/period.
 # * Input conversion required (names to ints)
-@router.get("/aggregates/", response_model=List[AggregatedSpeedResponse])
+@router.get("/aggregated_speeds/", response_model=List[AggregatedSpeedResponse])
 async def get_aggregated_speeds(
         session: AsyncSessionDep,
         day: str = Query(...,
@@ -161,22 +141,9 @@ async def get_aggregated_speeds(
     Returns aggregated average speed per link for the given day and time period.
     """
 
+    period = period.replace(" ", "_")  # period handles spaces
     day_int = day_to_int(day)
     period_int = period_to_int(period)
-
-    # day = day.lower()
-    # period = period.lower()
-    #
-    # if day not in DAY_NAME_TO_INT:
-    #     raise HTTPException(status_code=400,
-    #         detail=f"Invalid day: {day}. Must be one of {list(DAY_NAME_TO_INT.keys())}")
-    #
-    # if period not in PERIOD_NAME_TO_INT:
-    #     raise HTTPException(status_code=400,
-    #         detail=f"Invalid period: {period}. Must be one of {list(PERIOD_NAME_TO_INT.keys())}")
-    #
-    # day_int = DAY_NAME_TO_INT[day]
-    # period_int = PERIOD_NAME_TO_INT[period]
 
     statement = (
         select(
@@ -217,12 +184,6 @@ async def get_link_aggregate(
 
     valid_link_record = await validate_link_id_and_get_link(session, link_id)
 
-    # validate_link_statement = select(Link).where(Link.id == link_id)
-    # link_result = await session.execute(validate_link_statement)
-    # link = link_result.scalar_one_or_none()
-    # if not link:
-    #     raise HTTPException(status_code=404, detail=f"Invalid Link ID: {link_id}. Not found.")
-
     statement = (
         select(func.avg(SpeedRecord.average_speed).label("average_speed"))
         .where(
@@ -235,37 +196,8 @@ async def get_link_aggregate(
     speed_result = await session.execute(statement)
     avg_speed = speed_result.scalar()
 
-
     geometry_as_shapely = to_shape(valid_link_record.geometry)
     geojson_geometry = mapping(geometry_as_shapely)
-
-
-    # converted_geometry = list(to_shape(valid_link_record.geometry).geoms[0].coords)
-
-
-    # NOTE: For MultiLineString, to_shape() returns a MultiLineString → use .geoms[0] or iterate all .geoms.
-    # OPTIONAL:
-    # geometry = [
-    #     list(geom.coords) for geom in to_shape(valid_link_record.geometry).geoms
-    # ]
-    # OR EVEN:
-    # geometry = [
-    #     (x, y)
-    #     for geom in to_shape(valid_link_record.geometry).geoms
-    #     for x, y in geom.coords
-    # ]
-
-    # return LinkAggregateResponse(
-    #     link_id=valid_link_record.id,
-    #     road_name=valid_link_record.road_name,
-    #     usdk_speed_category=valid_link_record.usdk_speed_category,
-    #     funclass_id=valid_link_record.funclass_id,
-    #     volume_year=valid_link_record.volume_year,
-    #     average_speed=avg_speed,
-    #     geometry=converted_geometry,
-    #     day=day_int,
-    #     period=period_int,
-    # )
 
     return LinkAggregateResponse(
         type="Feature",
@@ -282,17 +214,69 @@ async def get_link_aggregate(
         }
     )
 
-    # A Shapely object can more easily calculate bounding box intersection etc.
 
+# TODO: Re-write this. Specs for # 1. for "Aggregated average speed per link for the given day and time period."
+#    change a little when you look at the description for MapBox visualization. The output needs to be a list
+#    of the full GeoJSON Features, etc. The spec doc leaves it a little ambiguous.
+# --------  TODO: MODIFY THIS: FOR ALL LINK_IDS, AGGREGATED SPEED & META DATA BY DAY, PERIOD  --------------------------------
+# SPECIFICATION:  "Speed and metadata for a single road segment."  -  STRATEGY:
+# 1. For a single link_id. collect all SpeedRecords for a given day and time period.
+# 2. Compute the average of the 'average_speed' column. Return that along with that link_id's meta data as well.
+@router.get("/aggregates", response_model=List[LinkAggregateResponse])
+async def get_link_aggregates(
+        session: AsyncSessionDep,
+        day: str = Query(...,
+            description=f"Day of week ({list(DAY_NAME_TO_INT.keys())})"),
+        period: str = Query(...,
+            description=f"Time period ({list(PERIOD_NAME_TO_INT.keys())})"),
+    ):
+    """
+    Returns speed and metadata for all road segments (link_ids) for a given day and time period. (MapBox GeoJSON format)
+    """
 
-# Time periods
-# 1 Overnight 00:00 03:59
-# 2 Early Morning 04:00 06:59
-# 3 AM Peak 07:00 09:59
-# 4 Midday 10:00 12:59
-# 5 Early Afternoon 13:00 15:59
-# 6 PM Peak 16:00 18:59
-# 7 Evening 19:00 23:59
+    day_int = day_to_int(day)
+    period_int = period_to_int(period)
+
+    # Single query: Join Link and SpeedRecord, group by link_id
+    statement = (
+        select(
+            Link,
+            func.avg(SpeedRecord.average_speed).label("average_speed")
+        )
+        .join(SpeedRecord, SpeedRecord.link_id == Link.id)
+        .where(
+            SpeedRecord.day_of_week == day_int,
+            SpeedRecord.period == period_int,
+            SpeedRecord.average_speed.isnot(None),
+        )
+        .group_by(Link.id)
+    )
+
+    result = await session.execute(statement)
+    rows = result.all()
+
+    responses = []
+    for link, avg_speed in rows:
+        geometry_as_shapely = to_shape(link.geometry)
+        geojson_geometry = mapping(geometry_as_shapely)
+
+        responses.append(LinkAggregateResponse(
+            type="Feature",
+            geometry=geojson_geometry,
+            properties={
+                "link_id": link.id,
+                "road_name": link.road_name,
+                "usdk_speed_category": link.usdk_speed_category,
+                "funclass_id": link.funclass_id,
+                "volume_year": link.volume_year,
+                "average_speed": avg_speed,
+                "day": day_int,
+                "period": period_int,
+            }
+        ))
+
+    return responses
+
 
 # Queries for which we have good data:
 # http://localhost:48000/aggregates/?day=wednesday&period=am_peak

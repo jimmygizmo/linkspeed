@@ -14,6 +14,8 @@ RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
 WORKDIR /home/linkspeed/workspace
 
+COPY traffic.ipynb /home/linkspeed/workspace/
+
 
 EXPOSE 8888
 
