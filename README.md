@@ -18,17 +18,19 @@
 
 #### ✅ PostGIS Postgres and all best-practice geospatial library usage
 
+#### ✅ Automatic DB initialization. 🔥 By June 5th: Automatic data loading!
+
 #### ✅ Complete working solution from cloning repo to MapBox visualization
 
 ---------------------------------------------------------------------------
 
 #### 🔥 Today is Wednesday June 4th and it is 7:30 AM Pacific time.
 
-#### 🔥 PLEASE STAY TUNED AND CHECK BACK TONIGHT OR TOMORROW!
+#### 🔥 The project is complete .. but I am still actively polishing it!
 
-#### 🔥 I am completing the extra problems and polishing a few minor things up!
+#### 🔥 (And I want to complete the extra questions today.)
 
-#### 🔥 Thank you  for the opportunity!
+#### 🔥 Thank you for the opportunity!
 
 ---------------------------------------------------------------------------
 
@@ -46,11 +48,11 @@ The project root is the directory with docker-compose.yml in it.
 
 ---------------------------------------------------------------------------
 ### 2. Launch the Docker Compose Full Stack, thus launching:
-- Async FastAPI Python application in a Python container.
-- PostGIS PostgreSQL DB Server in a PostGIS container.
-- Jupyter Notebook Server in a Python container.
+- Async FastAPI Python application in a Python container
+- PostGIS PostgreSQL DB Server in a PostGIS container
+- Jupyter Notebook Server in a Python container
 
-#### NOTE: Database and tables are automatically created upon first startup and persisted by Docker.
+#### NOTE: Database and tables are automatically created upon first startup and persisted by Docker. initial data must be loaded separately at this time but data seeding may soon be automated.
 
     docker compose up
 
