@@ -6,13 +6,13 @@
 
 ---------------------------------------------------------------------------
 
-#### 🔥 Fully Asynchronous Code, Components and Architecture
+#### 🔥 Fully Asynchronous Code (with Dependency Injection) & Async driver
 
 #### ✅ Full-featured, Best Practice FastAPI App Structure and Code
 
 #### ✅ Clean, Best-Practice Docker Compose Stack
 
-#### ✅ Best-practice Data Loading, Query Optimization, Architecture
+#### ✅ Best-practice Data Loading, Query Optimization, Optimized Processing
 
 #### ✅ Cleanly-integrated Jupyter Notebook Server and .ipynb Solution
 

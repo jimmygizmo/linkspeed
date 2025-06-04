@@ -53,19 +53,6 @@ class AggregatedSpeedResponse(BaseModel):
     average_speed: float
 
 
-# # /aggregates/{link_id}?day={day}&period={period}
-# class LinkAggregateResponse(BaseModel):
-#     link_id: int
-#     road_name: Optional[str]
-#     usdk_speed_category: Optional[int]
-#     volume_year: Optional[int]
-#     funclass_id: Optional[int]
-#     average_speed: Optional[float]
-#     geometry: List[Tuple[float, float]]
-#     period: int
-#     day: int
-
-
 # /aggregates/{link_id}?day={day}&period={period}
 class LinkAggregateResponse(BaseModel):
     type: Literal["Feature"] = "Feature"
@@ -280,30 +267,4 @@ async def get_link_aggregates(
 
 # Queries for which we have good data:
 # http://localhost:48000/aggregates/?day=wednesday&period=am_peak
-
-
-# OUR DATA FORMAT GOAL FOR THE VISUALIZATION. HOW IT WILL BE CONSUMED:
-# geojson_data must be a list of flat dicts.
-#
-# Each dict must contain:
-#
-# "geometry" as a full GeoJSON geometry dict (with "type" and "coordinates")
-#
-# "average_speed" at the top level
-
-# RETURN A LIST:
-# [
-#   {
-#     "geometry": {
-#       "type": "MultiLineString",
-#       "coordinates": [
-#         [[-121.123, 38.123], [-121.124, 38.124]]
-#       ]
-#     },
-#     "average_speed": 45.0,
-#     "road_name": "Main St"
-#   },
-#   ...
-# ]
-
 
