@@ -101,8 +101,8 @@ async def main():
     await async_db_create_all()
 
     async with AsyncSessionLocal() as session:
-        await load_links(session, "../../../datavolume/link_info.parquet.gz")
-        await load_speed_records(session, "../../../datavolume/duval_jan1_2024.parquet.gz")
+        await load_links(session, "../../../data/link_info.parquet.gz")
+        await load_speed_records(session, "../../../data/duval_jan1_2024.parquet.gz")
 
 
 if __name__ == "__main__":

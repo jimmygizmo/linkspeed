@@ -113,7 +113,7 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-.env
+disabled_vironment
 .env.test
 
 # parcel-bundler cache (https://parceljs.org/)
@@ -283,7 +283,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+disabled_vironment
 .venv
 env/
 venv/

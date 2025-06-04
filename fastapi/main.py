@@ -4,7 +4,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import magma.core.config as cfg
 from magma.core.logger import log
-from magma.routers import users
 from magma.routers import aggregates
 from magma.models import *  # To ensure a proper create_all()
 from magma.core.database import async_engine, Base
@@ -23,7 +22,7 @@ if cfg.stack_env == 'DEVELOPMENT':
           f"cfg.stack_env: {cfg.stack_env}")
 else:
     app = FastAPI(openapi_url=None, docs_url=None, redoc_url=None)
-    log.info(f"⚠️  Swagger/OpenAPI/ReDoc NOT ENABLED.  SAFE FOR:  🍀 PRODUCTION 🍀  - "
+    log.info(f"⚠️  Swagger/OpenAPI/ReDoc NOT ENABLED.  SAFE FOR:  🍀  PRODUCTION  🍀  - "
              f"cfg.stack_env: {cfg.stack_env}")
 
 
@@ -38,14 +37,13 @@ app.add_middleware(
         "http://bedrock-local:44443",
     ],
     allow_credentials=True,
-    allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
+    allow_methods=["*"],  # Allow all HTTP methods
     allow_headers=["*"],  # Allow all headers
 )
 
 
 # ########  ROUTERS  ########
 
-app.include_router(users.router)  # Users
 app.include_router(aggregates.router)  # Aggregates
 
 

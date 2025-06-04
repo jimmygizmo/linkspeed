@@ -96,7 +96,7 @@ class LinkAggregateResponse(BaseModel):
         }
 
 
-# ########  UTILITY FUNCTIONS - Parameter validation and conversion.  Link ID validation and Link retrieval..
+# ########  UTILITY FUNCTIONS - Parameter validation and conversion.  Link ID validation and Link retrieval.
 
 def day_to_int(day) -> int:
     day = day.lower()

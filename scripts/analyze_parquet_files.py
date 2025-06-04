@@ -15,7 +15,7 @@ dotenv.load_dotenv(dotenv.find_dotenv())
 
 # IMPORTANT! - The following path likely assumes you are running this script from within the /scripts/ directory
 #   inside the project.
-SEED_DATA_FILE_DIR = '../datavolume/'
+SEED_DATA_FILE_DIR = '../data/'
 
 
 # For the Magma code that cares about the format of these two seed data files, see:
@@ -26,22 +26,12 @@ SEED_DATA_FILE_DIR = '../datavolume/'
 
 
 # Link Info Dataset
-# PARQUET_FILE__LINKS: str = os.getenv('PARQUET_FILE__LINKS', default='DEFAULT--link_info.parquet.gz')
-PARQUET_FILE__LINKS: str = os.getenv('PARQUET_FILE__LINKS')
-if PARQUET_FILE__LINKS:
-    print(f"✅ PARQUET_FILE__LINKS: {PARQUET_FILE__LINKS}", flush=True)
-else:
-    print('🟥 ERROR: MISSING ENV VAR:  PARQUET_FILE__LINKS', flush=True)
-    exit(1)
+PARQUET_FILE__LINKS: str = os.getenv('PARQUET_FILE__LINKS', default='link_info.parquet.gz')
+print(f"✅ PARQUET_FILE__LINKS: {PARQUET_FILE__LINKS}", flush=True)
 
 # Speed Data
-# PARQUET_FILE__SPEED_RECORDS: str = os.getenv('PARQUET_FILE__SPEED_RECORDS', default='DEFAULT--duval_jan1_2024.parquet.gz')
-PARQUET_FILE__SPEED_RECORDS: str = os.getenv('PARQUET_FILE__SPEED_RECORDS')
-if PARQUET_FILE__SPEED_RECORDS:
-    print(f"✅ PARQUET_FILE__SPEED_RECORDS: {PARQUET_FILE__SPEED_RECORDS}", flush=True)
-else:
-    print('🟥 ERROR: MISSING ENV VAR:  PARQUET_FILE__SPEED_RECORDS', flush=True)
-    exit(1)
+PARQUET_FILE__SPEED_RECORDS: str = os.getenv('PARQUET_FILE__SPEED_RECORDS', default='duval_jan1_2024.parquet.gz')
+print(f"✅ PARQUET_FILE__SPEED_RECORDS: {PARQUET_FILE__SPEED_RECORDS}", flush=True)
 
 parquet_file_path__links = os.path.join(SEED_DATA_FILE_DIR, PARQUET_FILE__LINKS)
 df_link = pd.read_parquet(parquet_file_path__links, engine='pyarrow')

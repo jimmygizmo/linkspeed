@@ -5,7 +5,6 @@ networks:
 
 services:
 
-  # ---- POSTGRES ----
   linkspeed-postgres:
     container_name: linkspeed-postgres
     platform: linux/amd64
@@ -23,23 +22,7 @@ services:
       - "POSTGRES_USER=linkspeed"
       - "POSTGRES_PASSWORD=linkspeed"
 
-  # ---- PGADMIN ----
-#  linkspeed-pgadmin:
-#    container_name: linkspeed-pgadmin
-#    build: ./pgadmin
-#    image: linkspeed-pgadmin
-#    depends_on:
-#      - linkspeed-postgres
-#    restart: unless-stopped
-#    networks:
-#      - linkspeed-network
-#    ports:
-#      - "45088:80"
-#    environment:
-#      - "PGADMIN_DEFAULT_EMAIL=pgadmin@pgadmin.com"
-#      - "PGADMIN_DEFAULT_PASSWORD=pgadmin"
 
-  # ---- FASTAPI ----
   linkspeed-fastapi:
     container_name: linkspeed-fastapi
     build: ./fastapi
@@ -57,34 +40,8 @@ services:
       - "POSTGRES_DB=linkspeeddb"
       - "POSTGRES_USER=linkspeed"
       - "POSTGRES_PASSWORD=linkspeed"
-#    command: [
-#      "gunicorn",
-#      "-w",
-#      "4",
-#      "-k",
-#      "uvicorn.workers.UvicornWorker",
-#      "main:app",
-#      "--bind",
-#      "0.0.0.0:8000",
-#    ]
-###############
-#    command: [
-#      "/appdir/wait-for-it.sh",
-#      "--host=linkspeed-postgres",
-#      "--port=5432",
-#      "--timeout=20",
-#      "--",
-#      "gunicorn",
-#      "-w",
-#      "4",
-#      "-k",
-#      "uvicorn.workers.UvicornWorker",
-#      "main:app",
-#      "--bind",
-#      "0.0.0.0:8000",
-#    ]
 
-  # ---- NOTEBOOK ----    [DEV]
+
   linkspeed-notebook:
     container_name: linkspeed-notebook
     build: ./notebook
