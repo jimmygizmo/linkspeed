@@ -2,17 +2,22 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import magma.core.config as cfg
-from magma.core.logger import log
-from magma.routers import aggregates
-from magma.models import *  # To ensure a proper create_all()
-from magma.core.database import async_engine, Base
+import myapi.core.config as cfg
+from myapi.core.logger import log
+from myapi.routers import aggregates
+from myapi.models import *  # To ensure a proper create_all()
+from myapi.core.database import async_engine, Base
+from sqlalchemy import select, func
+from myapi.models.link import Link
+from myapi.seed.seed import load_links, load_speed_records
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
 
-# ########  ENTRYPOINT: LinkSpeed Coding Assignment - FastAPI Application:  magma  ########
+# ########  ENTRYPOINT: LinkSpeed Coding Assignment - FastAPI Application:  myapi  ########
 
 
-log.info("🔥🔥🔥  LINKSPEED MAGMA STARTING  ( 🌐 GIS Enabled 🌐 )  🔥🔥🔥")
+log.info("🔥🔥🔥  LINKSPEED MYAPI STARTING  ( 🌐 GIS Enabled 🌐 )  🔥🔥🔥")
 
 app = None  # Ensures global scope visibility for guvicorn
 
@@ -51,7 +56,7 @@ app.include_router(aggregates.router)  # Aggregates
 
 @app.get("/")
 async def root():
-    return {"message": "This is the root/default app in LinkSpeeds Magma (GIS Enabled)"}
+    return {"message": "This is the root/default app in the LinkSpeed 'myapi' FastAPI application (GIS Enabled)"}
 
 
 # ########  EVENT HANDLERS  ########
@@ -61,4 +66,31 @@ async def on_startup():
     log.debug(f"🚧🚧  Running: DB CREATE_ALL (via 🚀 startup 🚀 event)  🚧🚧")
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
+    # DATABASE_URL = 'postgresql+asyncpg://linkspeed:linkspeed@linkspeed-postgres:5432/linkspeeddb'
+    # seed_async_engine = create_async_engine(DATABASE_URL)
+    # seed_async_engine = create_async_engine(cfg.DATABASE_URL)
+    # AsyncSessionLocal = sessionmaker(
+    #     bind=seed_async_engine,
+    #     class_=AsyncSession,
+    #     expire_on_commit=False,
+    # )
+
+    AsyncSessionLocal = sessionmaker(
+        bind=async_engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
+    )
+
+    # Automatic data seeding
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(select(func.count()).select_from(Link))
+        row_count = result.scalar()
+        if row_count == 0:
+            log.warn("⚠️⚠️  Links table is empty!!! Seeding data...  ⚠️⚠️")
+            log.warn(". . . . Please be patient. This could take 4-5 minutes or longer on a slow host. . . .")
+            await load_links(session, file_path="data/link_info.parquet.gz")
+            await load_speed_records(session, file_path="data/duval_jan1_2024.parquet.gz")
+        else:
+            log.info(f"Links table already has {row_count} rows. Skipping seed.")
 

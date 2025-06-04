@@ -18,11 +18,11 @@ dotenv.load_dotenv(dotenv.find_dotenv())
 SEED_DATA_FILE_DIR = '../data/'
 
 
-# For the Magma code that cares about the format of these two seed data files, see:
-# /bedrock-gis/bedrock/magma/models/link.py             [maga.models.link]
-# /bedrock-gis/bedrock/magma/schemas/link.py            [maga.schemas.link]
-# /bedrock-gis/bedrock/magma/models/speed_record.py     [maga.models.speed_record]
-# /bedrock-gis/bedrock/magma/schemas/speed_record.py    [maga.schemas.speed_record]
+# For the "myapi" code that cares about the format of these two seed data files, see:
+# /linkspeed/fastapi/myapi/models/link.py             [myapi.models.link]
+# /linkspeed/fastapi/myapi/schemas/link.py            [myapi.schemas.link]
+# /linkspeed/fastapi/myapi/models/speed_record.py     [myapi.models.speed_record]
+# /linkspeed/fastapi/myapi/schemas/speed_record.py    [myapi.schemas.speed_record]
 
 
 # Link Info Dataset

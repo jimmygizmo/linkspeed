@@ -4,9 +4,9 @@ import pandas as pd
 from shapely.geometry import shape
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
-from magma.core.database import Base
-from magma.models.link import Link
-from magma.models.speed_record import SpeedRecord
+from myapi.core.database import Base
+from myapi.models.link import Link
+from myapi.models.speed_record import SpeedRecord
 
 
 DATABASE_URL = 'postgresql+asyncpg://linkspeed:linkspeed@localhost:45432/linkspeeddb'

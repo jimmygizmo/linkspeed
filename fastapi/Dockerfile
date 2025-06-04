@@ -1,7 +1,11 @@
-# Bedrock-GIS, Magma-GIS FastAPI Services
+# "myapi" FastAPI Services
 FROM python:3.10.9-slim
 
 WORKDIR /appdir
+
+# wait-for-it.sh pauses FastAPI startup until postgres is listening on its port
+COPY ./wait-for-it.sh /appdir/wait-for-it.sh
+RUN chmod o+x /appdir/wait-for-it.sh
 
 # Install Linux build tools to enable some Python installations
 RUN apt-get update && apt-get install -y \
@@ -15,22 +19,25 @@ RUN pip install --upgrade setuptools
 
 COPY requirements.txt /appdir/
 
-# Install all Python dependencies. (Magma application module installed separately below)
+# Install all Python dependencies. (NOTE: The "myapi" FastAPI application module is installed separately below)
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Magma application module package, ready for installation
-COPY ./magma/ /appdir/magma/
+# "myapi" application module package, ready for installation
+COPY ./myapi/ /appdir/myapi/
+
+# Parquet seed data
+COPY ./data/ /appdir/data/
 
 # Entrypoint file
 COPY ./main.py /appdir/
 
-# setup.py enables pip installation of magma app module
+# setup.py enables pip installation of myapi app module
 COPY ./setup.py /appdir/
 
-# Install the Bedrock Magma application module
+# Install the "myapi" FastAPI application module
 RUN pip install .
 
 EXPOSE 8000
 
-CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "main:app", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "-w", "1", "-k", "uvicorn.workers.UvicornWorker", "main:app", "--bind", "0.0.0.0:8000"]
 

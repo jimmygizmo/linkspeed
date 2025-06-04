@@ -40,6 +40,21 @@ services:
       - "POSTGRES_DB=linkspeeddb"
       - "POSTGRES_USER=linkspeed"
       - "POSTGRES_PASSWORD=linkspeed"
+    command: [
+      "/appdir/wait-for-it.sh",
+      "--host=linkspeed-postgres",
+      "--port=5432",
+      "--timeout=20",
+      "--",
+      "gunicorn",
+      "-w",
+      "1",
+      "-k",
+      "uvicorn.workers.UvicornWorker",
+      "main:app",
+      "--bind",
+      "0.0.0.0:8000",
+    ]
 
 
   linkspeed-notebook:

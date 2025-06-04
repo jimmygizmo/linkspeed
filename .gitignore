@@ -1,7 +1,7 @@
 # .gitignore - LinkSpeed Assignment - Coding Assessment - Submitted by James Mannix via Tyler.
 
 
-# The build dir comes from local pip installs like the "pip install ." to install Magma for local development.
+# The build dir comes from local pip installs like the "pip install ." to install the "myapi" FastAPI application for local development.
 # An egg info dir is also created but that is already covered in this .gitignore.
 build/
 

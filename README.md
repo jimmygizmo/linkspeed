@@ -18,7 +18,7 @@
 
 #### ✅ PostGIS Postgres and all best-practice geospatial library usage
 
-#### ✅ Automatic DB initialization. 🔥 By June 5th: Automatic data loading!
+#### ✅ Automatic DB initialization. Automatic smart data seeding
 
 #### ✅ Complete working solution from cloning repo to MapBox visualization
 
@@ -28,7 +28,9 @@
 
 #### 🔥 The project is complete .. but I am still actively polishing it!
 
-#### 🔥 (And I want to complete the extra questions today.)
+#### 🔥 June 4th 4:30 PM - Auto-data-seeding now makes setup WAY simpler!!
+
+#### 🔥 I'm going to complete the extra qustions this evening.
 
 #### 🔥 Thank you for the opportunity!
 
@@ -56,55 +58,12 @@ The project root is the directory with docker-compose.yml in it.
 
     docker compose up
 
----------------------------------------------------------------------------
-### 3. Create local virtual environment for running the DB data loading script
-
-I use Pyenv and I strongly recommend it. For automatic Pyenv activation, this project already has a
-.python-version file specifying the virtual environment name: "ve.linkspeed"
-
-Use Python 3.10.9 and install the version of Python with Pyenv if you don't already have it.
-
-Create the virtual environment:
-
-    pyenv virtualenv 3.10.9 ve.linkspeed
-
-* *Or you can use your own virtual environment of choice. NOTE: Don't go higher than Python 3.11 (MapBox).*
-
-Now install the project requirements so you can run the data loader script.
-
-    (FROM THE REPOSITORY ROOT)
-
-    pip install -r fastapi/requirements.txt
-
-Install the Magma FastAPI Application itself (the API endpoints for the assignment solution):
-
-    FIRST CHANGE TO THE FASTAPI DIRECTORY, ADJACENT TO THE MAGMA setup.py FILE:
-
-    cd fastapi
-
-    DO PIP INSTALL 'dot' ( . meaning here, or 'the module for this setup.py')
-
-    pip install .
-
-    (You should see it install 'magma', which is the FastAPI application, as a module.)
-
----------------------------------------------------------------------------
-### 4. Load the Parquet data using the seed.py script
-#### NOTE: Later today I may make this script even easier to locate or maybe make data-seeding automatic.
-
-    NAVIGATE TO THE SEED SCRIPT (in FastAPI standard location):
-
-    cd fastapi/magma/seed
-
-    RUN THE SEED SCRIPT:
-
-    python ./seed.py
-
-
+NOTE: Data-seeding is automatic but takes 4-5 minutes. Please wait 4-5 minutes before using the API upon first startup.
+On subsequent startups of the stack, you can use the API immediately.
 
 ---------------------------------------------------------------------------
 
-### 4. Navigate with your Web Browser to the Jupyter Server and the solution .ipynb file
+### 3. Navigate with your Web Browser to the Jupyter Server and the solution .ipynb file
 
     ----> NAVIGATE TO THE JUPYTER SERVER:
 
