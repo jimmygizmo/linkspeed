@@ -2,6 +2,6 @@
 # Not all days or time periods have data. Some good ones are noted here:
 
 # Queries for which we have good data:
-# http://localhost:48000/aggregates/?day=wednesday&period=am_peak
+# http://localhost:3131/aggregates/?day=wednesday&period=am_peak
 
 

@@ -67,19 +67,19 @@ On subsequent startups of the stack, you can use the API immediately.
 
     ----> NAVIGATE TO THE JUPYTER SERVER:
 
-    http://localhost:48888/
+    http://localhost:9797/
 
     Open file: ---- traffic.ipynb
 
 
     ----> NAVIGATE TO THE OPENAPI/SWAGGER API TOOLS & DOCS:
 
-    http://localhost:48000/docs
+    http://localhost:3131/docs
 
 
     ----> NAVIGATE TO THE API ITSELF:
 
-    http://localhost:48000
+    http://localhost:3131
 
 
 ---------------------------------------------------------------------------

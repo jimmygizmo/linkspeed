@@ -33,7 +33,7 @@ services:
     networks:
       - linkspeed-network
     ports:
-      - "48000:8000"
+      - "3131:8000"
     environment:
       - "STACK_ENV=DEVELOPMENT"
       - "FASTAPI_LOG_LEVEL=DEBUG"
@@ -68,7 +68,7 @@ services:
     networks:
       - linkspeed-network
     ports:
-      - "48888:8888"
+      - "9797:8888"
     volumes:
       - ./notebook:/home/bedrock/workspace
     environment:
