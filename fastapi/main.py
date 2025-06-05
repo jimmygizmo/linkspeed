@@ -18,7 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 # ########  ENTRYPOINT: LinkSpeed Coding Assignment - FastAPI Application:  myapi  ########
 
 
-log.info("🔥🔥🔥  LINKSPEED MYAPI STARTING  ( 🌐 GIS Enabled 🌐 )  🔥🔥🔥")
+log.info("🔥🔥🔥  LINKSPEED MYAPI STARTING  🔥🔥🔥")
 
 app = None  # Ensures global scope visibility for guvicorn
 
@@ -65,7 +65,7 @@ async def root():
 
 @app.on_event("startup")  # Deprecated but still useful
 async def on_startup():
-    log.debug(f"🚧🚧  Running: DB CREATE_ALL (via 🚀 startup 🚀 event)  🚧🚧")
+    log.debug(f"🚀  Running:  DB CREATE_ALL  (via startup event)  🚀")
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
@@ -80,8 +80,8 @@ async def on_startup():
         result = await session.execute(select(func.count()).select_from(Link))
         row_count = result.scalar()
         if row_count == 0:
-            log.warn("⚠️⚠️  Links table is empty!!! Seeding data...  ⚠️⚠️")
-            log.warn(". . . . Please be patient. This could take 4-5 minutes or longer on a slow host. . . .")
+            log.warn("⚠️  Links table is empty!!!  Seeding data...")
+            log.warn("⚠️️  IMPORTANT!  ⛔  PLEASE WAIT UNTIL DATA LOADING COMPLETES IN 3-4 MINUTES  ⛔")
             await load_links(session, file_path="data/link_info.parquet.gz")
             await load_speed_records(session, file_path="data/duval_jan1_2024.parquet.gz")
         else:

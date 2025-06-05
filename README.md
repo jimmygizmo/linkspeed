@@ -1,12 +1,12 @@
-## 🌐 Senior Python Engineer - Coding Assessment
+## Senior Python Engineer - Coding Assessment
 
-## 🌐 "LinkSpeed" - Submission by James Mannix
+## 🌐 LinkSpeed - Submission by James Mannix
 
 ### A FastAPI Full Stack Application including Notebook Server
 
 ---------------------------------------------------------------------------
 
-#### 🔥 Fully asynchronous code (with Dependency Injection) & async driver
+#### ✅ Fully asynchronous code (with Dependency Injection) & async driver
 
 #### ✅ Full-featured, best-practice FastAPI app structure, modular code
 
@@ -24,15 +24,11 @@
 
 ---------------------------------------------------------------------------
 
-#### 🔥 Today is Wednesday June 4th and it is 7:30 AM Pacific time.
+#### 🔵 PLEASE NOTE: The Architecture Chart and the extra questions are pending.
 
-#### 🔥 The project is complete .. but I am still actively polishing it!
+#### 🔵 As time allows for other job interviews, I will update more if possible.
 
-#### 🔥 June 4th 4:30 PM - Auto-data-seeding now makes setup WAY simpler!!
-
-#### 🔥 I'm going to complete the extra qustions this evening.
-
-#### 🔥 Thank you for the opportunity!
+#### 🔵 Thank you for this opportunity!
 
 ---------------------------------------------------------------------------
 
@@ -54,12 +50,11 @@ You will be in the project/repository root. The root is the directory with docke
 - PostGIS PostgreSQL DB Server in a PostGIS container
 - Jupyter Notebook Server in a Python container
 
-#### NOTE: Database and tables are automatically created upon first startup and persisted by Docker. initial data must be loaded separately at this time but data seeding may soon be automated.
 
     docker compose up
 
-NOTE: Data-seeding is automatic but takes 4-5 minutes. Please wait 4-5 minutes before using the API upon first startup.
-On subsequent startups of the stack, you can use the API immediately.
+IMPORTANT: Data-seeding is automatic but takes 3-4 minutes. Upon FIRST STARTUP only, watch the log for status on data
+loading. You will see "✅ Links loaded" and then "✅ SpeedRecords loaded". You can then use the API.
 
 ---------------------------------------------------------------------------
 
@@ -69,7 +64,7 @@ On subsequent startups of the stack, you can use the API immediately.
 
     http://localhost:9797
 
-    Open file: ---- traffic.ipynb
+    Open this file if it is not already open for you: ---- traffic.ipynb
 
 
     ----> NAVIGATE TO THE OPENAPI/SWAGGER API TOOLS & DOCS:
@@ -82,14 +77,30 @@ On subsequent startups of the stack, you can use the API immediately.
     http://localhost:3131
 
 
+    ----> SINGLE LINK (for day/period), AGGREGATED, WITH METADATA (GeoJSON):
+
+    http://localhost:3131/aggregates/16981048?day=wednesday&period=am_peak
+
+
+    ----> ALL LINKS (for day/period), AGGREGATED, WITH METADATA (GeoJSON):
+
+    http://localhost:3131/aggregates?day=wednesday&period=am_peak
+
+
+    ----> SLOW LINKS (under threshold for given days), AGGREGATED, WITH METADATA (GeoJSON):
+
+    http://localhost:3131/patterns/slow_links?period=am_peak&threshold=20&min_days=1
+
 ---------------------------------------------------------------------------
 
-This is a very polished project/submission, but I am still working on the extra questions.
-Thank you for the opportunity to present this!
+This is a very polished project/submission, but I am still working on the extra questions and
+architecture chart as my very limited time allows. (I can create top-quality charts and diagrams.)
+I will provide further updates as I can, but especially upon request.
+Thank you for the opportunity to be considered for this role!
 
 ---------------------------------------------------------------------------
 
-### This repository will be deleted or made private after the assessment and/or upon request.
+#### * *This repository will be deleted or made private after the assessment and/or upon request.*
 
 ---------------------------------------------------------------------------
 
