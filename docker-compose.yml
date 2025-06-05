@@ -73,14 +73,12 @@ services:
       - ./notebook:/home/bedrock/workspace
     environment:
       - "JUPYTERLAB_SETTINGS_DIR=/home/linkspeed/workspace"
-      - "MAPBOX_TOKEN=pk.eyJ1Ijoic21hcnRtZXRhbCIsImEiOiJjbWJnbnRhbHIwMHN5MmpvaDN5M2E3dnptIn0.OOMN3laXveAb-ep2U2WqsQ"
-      # TODO: Clarify/comment BASE_URL. Needs a much better name.
-      - "BASE_URL=http://linkspeed-fastapi:8000"
     command: [
       "start-notebook.sh",
       "--NotebookApp.token=''",
       "--NotebookApp.password=''",
       "--ServerApp.iopub_data_rate_limit=10000000",
       "--ServerApp.rate_limit_window=10.0",
+      "--LabApp.default_url='/lab/tree/traffic.ipynb'",
     ]
 

@@ -1,6 +1,4 @@
-# To match versions exactly and guarantee proper, test-validated operation, install modules
-# using requirements-pinned.txt. This requirements.txt is only for when you want all the latest versions.
-
+# LinkSpeed Full Stack - main/combined requirements.txt
 
 fastapi[all]
 

@@ -1,7 +1,7 @@
 import myapi.core.config as cfg
 from myapi.core.logger import log
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.orm import declarative_base
 
 
 # ########    DATABASE INITIALIZATION    ########

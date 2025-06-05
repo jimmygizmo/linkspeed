@@ -21,3 +21,13 @@ EXPOSE 8888
 # NOTE: Compose file has notebook start options required for our large response payloads. Use the compose CMD.
 #CMD ["start-notebook.sh", "--NotebookApp.token=''", "--NotebookApp.password=''"]
 
+# For reference, here is the Compose start command showing those important options:
+#    command: [
+#      "start-notebook.sh",
+#      "--NotebookApp.token=''",
+#      "--NotebookApp.password=''",
+#      "--ServerApp.iopub_data_rate_limit=10000000",
+#      "--ServerApp.rate_limit_window=10.0",
+#      "--LabApp.default_url='/lab/tree/traffic.ipynb'",
+#    ]
+

@@ -11,7 +11,7 @@ from sqlalchemy import select, func
 from myapi.models.link import Link
 from myapi.seed.seed import load_links, load_speed_records
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 # ########  ENTRYPOINT: LinkSpeed Coding Assignment - FastAPI Application:  myapi  ########
@@ -66,15 +66,6 @@ async def on_startup():
     log.debug(f"🚧🚧  Running: DB CREATE_ALL (via 🚀 startup 🚀 event)  🚧🚧")
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-
-    # DATABASE_URL = 'postgresql+asyncpg://linkspeed:linkspeed@linkspeed-postgres:5432/linkspeeddb'
-    # seed_async_engine = create_async_engine(DATABASE_URL)
-    # seed_async_engine = create_async_engine(cfg.DATABASE_URL)
-    # AsyncSessionLocal = sessionmaker(
-    #     bind=seed_async_engine,
-    #     class_=AsyncSession,
-    #     expire_on_commit=False,
-    # )
 
     AsyncSessionLocal = sessionmaker(
         bind=async_engine,

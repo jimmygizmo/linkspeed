@@ -40,7 +40,7 @@
 
 ### 1. Clone the repository and then cd into it.
 
-The project root is the directory with docker-compose.yml in it.
+You will be in the project/repository root. The root is the directory with docker-compose.yml in it.
 
 
     git clone git@github.com:jimmygizmo/linkspeed.git
@@ -67,7 +67,7 @@ On subsequent startups of the stack, you can use the API immediately.
 
     ----> NAVIGATE TO THE JUPYTER SERVER:
 
-    http://localhost:9797/
+    http://localhost:9797
 
     Open file: ---- traffic.ipynb
 
@@ -84,10 +84,8 @@ On subsequent startups of the stack, you can use the API immediately.
 
 ---------------------------------------------------------------------------
 
-During today (June 4th) I will add some more clear information here about this solution/repository.
-As I noted above, I am still putting some finishing touches on it and completing the extra questions.
-The main solution in the Jupyter Notebook and the FastAPI application all work perfectly and are
-expertly engineered. Thank you for the opportunity to present this!
+This is a very polished project/submission, but I am still working on the extra questions.
+Thank you for the opportunity to present this!
 
 ---------------------------------------------------------------------------
 
