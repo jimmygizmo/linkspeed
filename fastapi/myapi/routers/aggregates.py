@@ -8,6 +8,7 @@ from myapi.services.aggregates import get_single_link_aggregate, get_all_link_ag
 # ########    FastAPI ROUTER:  aggregates    ########
 
 
+# TODO: Need to consolidate these lookups to a single logical place as we use them in 2-3 different files.
 DAY_NAME_TO_INT = {
     "monday": 0, "tuesday": 1, "wednesday": 2,
     "thursday": 3, "friday": 4, "saturday": 5, "sunday": 6

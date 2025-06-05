@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import myapi.core.config as cfg
 from myapi.core.logger import log
 from myapi.routers import aggregates
+from myapi.routers import patterns
 from myapi.models import *  # To ensure a proper create_all()
 from myapi.core.database import async_engine, Base
 from sqlalchemy import select, func
@@ -50,6 +51,7 @@ app.add_middleware(
 # ########  ROUTERS  ########
 
 app.include_router(aggregates.router)  # Aggregates
+app.include_router(patterns.router)  # Patterns
 
 
 # ########  ROOT API HANDLERS  ########
